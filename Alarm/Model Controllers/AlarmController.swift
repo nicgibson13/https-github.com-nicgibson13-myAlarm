@@ -9,7 +9,16 @@
 import Foundation
 import UserNotifications
 
+protocol AlarmScheduler: class {
+    func scheduleUserNotification(for alarm: Alarm)
+    func cancelUserNotification(for alarm: Alarm)
+}
+
 class AlarmController: AlarmScheduler {
+    
+    init() {
+        loadFromPersistentStore()
+    }
     
     var alarms: [Alarm] = []
     
@@ -22,7 +31,7 @@ class AlarmController: AlarmScheduler {
     }
     
     func updateAlarm(alarm: Alarm, fireDate: Date, name: String, isEnabled: Bool) {
-    
+        
         alarm.fireDate = fireDate
         alarm.name = name
         alarm.isEnabled = isEnabled
@@ -60,7 +69,7 @@ class AlarmController: AlarmScheduler {
         do {
             let data = try Data(contentsOf: fileURL())
             let decodedAlarm = try jsonDecoder.decode([Alarm].self, from: data)
-            AlarmController.sharedInstance.alarms = decodedAlarm
+            alarms = decodedAlarm
         } catch let error {
             print("Error loading from persistent store: \(error.localizedDescription)")
         }
@@ -75,12 +84,6 @@ class AlarmController: AlarmScheduler {
             print("Error saving to persistent store: \(error.localizedDescription)")
         }
     }
-}
-
-
-protocol AlarmScheduler: class {
-    func scheduleUserNotification(for alarm: Alarm)
-    func cancelUserNotification(for alarm: Alarm)
 }
 
 extension AlarmScheduler{
@@ -101,7 +104,7 @@ extension AlarmScheduler{
         }
     }
     
-    func cancelLocalNotification(for alarm: Alarm){
+    func cancelUserNotification(for alarm: Alarm){
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [alarm.uuid])
     }
 }

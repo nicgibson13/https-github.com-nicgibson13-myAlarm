@@ -40,8 +40,15 @@ class AlarmDetailTableViewController: UITableViewController {
         } else {
             AlarmController.sharedInstance.addAlarm(fireDate: datePick.date, name: alarmName, isEnabled: alarmIsOn)
         }
+        navigationController?.popViewController(animated: true)
     }
     @IBAction func enableButtonTapped(_ sender: Any) {
+        if let alarm = alarm {
+            AlarmController.sharedInstance.toggleEnabled(for: alarm)
+            alarmIsOn = alarm.isEnabled
+        }else{
+            alarmIsOn = !alarmIsOn
+        }
     }
     
     
